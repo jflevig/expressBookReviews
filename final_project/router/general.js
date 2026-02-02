@@ -47,10 +47,25 @@ async function getBookByIsbn(isbn) {
 public_users.get('/isbn/:isbn', async function (req, res) {
   const isbn = req.params.isbn;
   try {
+    if (!isbn) {
+      return res.status(400).json({ message: "ISBN is required" });
+    }
+
     const book = await getBookByIsbn(isbn);
-    return res.status(200).json(book);
+
+    if (!book) {
+      return res.status(404).json({ message: "Book not found" });
+    }
+
+    return res.status(200).json({
+      message: "Book retrieved successfully",
+      book
+    });
+
   } catch (err) {
-    return res.status(500).json({ message: "Error retrieving books" })
+    return res.status(500).json({
+      message: "Internal server error"
+    });
   }
  });
   
@@ -67,10 +82,25 @@ async function getBookByAuthor(author) {
 public_users.get('/author/:author', async function (req, res) {
   const author = req.params.author;
   try {
-    const bookList = await getBookByAuthor(author);
-    return res.status(200).json(bookList);
+    if (!author) {
+      return res.status(400).json({ message: "Author is required" });
+    }
+
+    const book = await getBookByIsbn(author);
+
+    if (!book) {
+      return res.status(404).json({ message: "Book not found" });
+    }
+
+    return res.status(200).json({
+      message: "Book retrieved successfully",
+      book
+    });
+
   } catch (err) {
-    return res.status(500).json({ message: "Error retrieving books" })
+    return res.status(500).json({
+      message: "Internal server error"
+    });
   }
 });
 
@@ -86,11 +116,26 @@ async function getBookByTitle(title) {
 }
 public_users.get('/title/:title', async function (req, res) {
   const title = req.params.title;
-try {
-    const bookList = await getBookByTitle(title);
-    return res.status(200).json(bookList);
+  try {
+    if (!title) {
+      return res.status(400).json({ message: "Title is required" });
+    }
+
+    const book = await getBookByIsbn(title);
+
+    if (!book) {
+      return res.status(404).json({ message: "Book not found" });
+    }
+
+    return res.status(200).json({
+      message: "Book retrieved successfully",
+      book
+    });
+
   } catch (err) {
-    return res.status(500).json({ message: "Error retrieving books" })
+    return res.status(500).json({
+      message: "Internal server error"
+    });
   }
 });
 
@@ -98,7 +143,7 @@ try {
 public_users.get('/review/:isbn',function (req, res) {
   const isbn = req.params.isbn;
   const reviews = books[isbn].reviews
-  return res.json(reviews);
+  return res.json({ message: "Reviews retrieved successfully", reviews: reviews });
 });
 
 module.exports.general = public_users;
