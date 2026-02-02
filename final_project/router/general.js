@@ -41,7 +41,10 @@ public_users.get('/', async function (req, res) {
 
 // Get book details based on ISBN
 async function getBookByIsbn(isbn) {
-  return books[isbn]
+  if (!books[isbn]) {
+    return null; // caso "no encontrado"
+  }
+  return books[isbn];
 }
 
 public_users.get('/isbn/:isbn', async function (req, res) {
@@ -77,6 +80,9 @@ async function getBookByAuthor(author) {
       filteredBooks[key] = books[key];
     }
   })
+  if (Object.keys(filteredBooks).length === 0) {
+    return null; // caso "no encontrado"
+  }
   return filteredBooks;
 }
 public_users.get('/author/:author', async function (req, res) {
@@ -86,7 +92,7 @@ public_users.get('/author/:author', async function (req, res) {
       return res.status(400).json({ message: "Author is required" });
     }
 
-    const book = await getBookByIsbn(author);
+    const book = await getBookByAuthor(author);
 
     if (!book) {
       return res.status(404).json({ message: "Book not found" });
@@ -112,6 +118,9 @@ async function getBookByTitle(title) {
       filteredBooks[key] = books[key];
     }
   })
+  if (Object.keys(filteredBooks).length === 0) {
+    return null; // caso "no encontrado"
+  }
   return filteredBooks;
 }
 public_users.get('/title/:title', async function (req, res) {
@@ -121,7 +130,7 @@ public_users.get('/title/:title', async function (req, res) {
       return res.status(400).json({ message: "Title is required" });
     }
 
-    const book = await getBookByIsbn(title);
+    const book = await getBookByTitle(title);
 
     if (!book) {
       return res.status(404).json({ message: "Book not found" });
@@ -143,6 +152,9 @@ public_users.get('/title/:title', async function (req, res) {
 public_users.get('/review/:isbn',function (req, res) {
   const isbn = req.params.isbn;
   const reviews = books[isbn].reviews
+  if (Object.keys(reviews).length === 0) {
+    return res.json({ message: "No reviews found for this book" });
+  }
   return res.json({ message: "Reviews retrieved successfully", reviews: reviews });
 });
 
